@@ -1,0 +1,67 @@
+name: deploy-to-cloud-run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      # 1. Check out code
+      - name: Check out source code
+        uses: actions/checkout@v3
+
+      # 2. Set up Google Cloud auth
+      # Using a service account key (stored in GitHub Secrets as GCP_SA_KEY)
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 3. Configure Docker to use GCP registry
+      - name: Configure docker to use gcr
+        run: gcloud auth configure-docker
+
+      # 4. Build Docker image
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-ner-service:${{ github.sha }}"
+          docker build -t "$IMAGE_NAME" .
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+
+      # 5. Push Docker image to GCR
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE_NAME }}
+
+      # 6. Set up Terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # 7. Terraform Init
+      - name: Terraform init
+        working-directory: ./infra
+        run: terraform init
+
+      # 8. Terraform Plan
+      - name: Terraform plan
+        working-directory: ./infra
+        run: |
+          terraform plan \
+            -var "project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var "region=us-central1" \
+            -var "service_name=my-ner-service" \
+            -var "image_name=${{ env.IMAGE_NAME }}"
+
+      # 9. Terraform Apply
+      - name: Terraform apply
+        working-directory: ./infra
+        run: |
+          terraform apply -auto-approve \
+            -var "project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var "region=us-central1" \
+            -var "service_name=my-ner-service" \
+            -var "image_name=${{ env.IMAGE_NAME }}"
