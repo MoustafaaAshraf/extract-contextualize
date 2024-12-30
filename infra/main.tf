@@ -5,25 +5,52 @@ resource "google_cloud_run_service" "medical_entity_extraction_service" {
 
     template {
         spec {
-        containers {
-            image = var.image_name
-            
-            resources {
-            limits = {
-                memory = var.memory_limit
-                cpu    = var.cpu_limit
-            }
+            containers {
+                image = var.image_name
+                
+                resources {
+                    limits = {
+                        memory = var.memory_limit
+                        cpu    = var.cpu_limit
+                    }
+                }
+
+                # Add startup probe
+                startup_probe {
+                    http_get {
+                        path = "/health"
+                    }
+                    initial_delay_seconds = 10
+                    timeout_seconds = 3
+                    period_seconds = 5
+                    failure_threshold = 3
+                }
+
+                # Add environment variables
+                dynamic "env" {
+                    for_each = var.env_vars
+                    content {
+                        name  = env.key
+                        value = env.value
+                    }
+                }
+
+                # Add port configuration
+                ports {
+                    container_port = 8080
+                }
             }
 
-            # Dynamic environment variables
-            dynamic "env" {
-            for_each = var.env_vars
-            content {
-                name  = env.key
-                value = env.value
-            }
-            }
+            # Add container configuration
+            container_concurrency = 80
+            timeout_seconds = 300
         }
+
+        metadata {
+            annotations = {
+                "autoscaling.knative.dev/maxScale" = "10"
+                "autoscaling.knative.dev/minScale" = "0"
+            }
         }
     }
 
