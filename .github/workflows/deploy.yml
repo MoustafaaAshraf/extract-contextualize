@@ -47,19 +47,19 @@ jobs:
       # 5. Build Docker image
       - name: Build Docker image
         run: |
-          IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:${{ github.sha }}"
+          IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}:${{ github.sha }}"
           docker build \
-            --cache-from gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest \
+            --cache-from gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}:latest \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             -t "$IMAGE_NAME" .
-          docker tag "$IMAGE_NAME" gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest
+          docker tag "$IMAGE_NAME" gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}:latest
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       # 6. Push Docker image to GCR
       - name: Push Docker image
         run: |
           docker push ${{ env.IMAGE_NAME }}
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}:latest
 
       # 7. Set up Terraform
       - name: Install Terraform
