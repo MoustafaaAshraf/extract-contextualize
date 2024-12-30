@@ -71,19 +71,19 @@ push-image: ## Push the image
 	@ docker push ${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest
 
 terraform-init: ## Initialize Terraform
-	@ terraform init
+	@ cd infra && terraform init
 
 terraform-plan: ## Plan Terraform
-	@ terraform plan \
+	@ cd infra && terraform plan \
 		-var="project_id=${GCP_PROJECT_ID}" \
 		-var="image_name=${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 terraform-apply: ## Apply Terraform
-	@ terraform apply \
+	@ cd infra && terraform apply \
 		-var="project_id=${GCP_PROJECT_ID}" \
 		-var="image_name=${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 test-health: ## Test health endpoint
-	@ curl -f $(shell terraform output -raw service_url)/health
+	@ curl -f $(shell cd infra && terraform output -raw service_url)/health
