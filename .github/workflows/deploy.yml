@@ -85,23 +85,23 @@ jobs:
 
       # 10. Terraform Plan
       - name: Terraform plan
-        working-directory: ./infra
         run: |
-          make terraform-plan
+          cd infra && make -C .. terraform-plan
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
       # 11. Terraform Apply
       - name: Terraform apply
-        working-directory: ./infra
         run: |
-          make terraform-apply
+          cd infra && make -C .. terraform-apply
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
       # # Run setup before deployment
       # - name: Setup GCP resources
