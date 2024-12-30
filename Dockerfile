@@ -25,4 +25,4 @@ EXPOSE 8080
 # - main:app: refers to the FastAPI instance in main.py
 # - --host 0.0.0.0: allows connections from any IP
 # - --port 8080: runs the server on port 8080
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]
