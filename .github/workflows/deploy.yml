@@ -32,6 +32,7 @@ jobs:
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+          token_format: 'access_token'
 
       # 3. Set up Cloud SDK
       - name: Set up Cloud SDK
@@ -40,9 +41,10 @@ jobs:
           version: '>= 363.0.0'
           install_components: 'beta,kubectl'
 
-      # 4. Configure Docker to use GCP registry
-      - name: Configure docker to use gcr
-        run: gcloud auth configure-docker
+      # 4. Configure Docker to use Artifact Registry
+      - name: Configure docker to use Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev --quiet
 
       # 5. Build Docker image
       - name: Build Docker image
