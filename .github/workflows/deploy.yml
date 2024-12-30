@@ -5,14 +5,26 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    concurrency:
+      group: production
+      cancel-in-progress: false
+
     steps:
 
       # 1. Check out code
       - name: Check out source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # 2. Set up Google Cloud auth
       # Using a service account key (stored in GitHub Secrets as GCP_SA_KEY)
@@ -21,47 +33,97 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # 3. Configure Docker to use GCP registry
+      # 3. Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: '>= 363.0.0'
+          install_components: 'beta,kubectl'
+
+      # 4. Configure Docker to use GCP registry
       - name: Configure docker to use gcr
         run: gcloud auth configure-docker
 
-      # 4. Build Docker image
+      # 5. Create Artifact Registry repository
+      - name: Create Artifact Registry repository
+        run: |
+          gcloud artifacts repositories create medical-entity-extraction-repo \
+          --repository-format=docker \
+          --location=eu-west2 \
+          --description="Docker repository for medical entity extraction" \
+          || true
+
+      # 6. Build Docker image
       - name: Build Docker image
         run: |
-          IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-ner-service:${{ github.sha }}"
-          docker build -t "$IMAGE_NAME" .
+          IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:${{ github.sha }}"
+          docker build \
+            --cache-from gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            -t "$IMAGE_NAME" .
+          docker tag "$IMAGE_NAME" gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      # 5. Push Docker image to GCR
+      # 7. Push Docker image to GCR
       - name: Push Docker image
         run: |
           docker push ${{ env.IMAGE_NAME }}
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/medical-service:latest
 
-      # 6. Set up Terraform
+      # 8. Set up Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # 7. Terraform Init
+      # 9. Terraform Init
       - name: Terraform init
         working-directory: ./infra
         run: terraform init
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # 8. Terraform Plan
+      # 10. Terraform Plan
       - name: Terraform plan
         working-directory: ./infra
         run: |
-          terraform plan \
-            -var "project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var "region=us-central1" \
-            -var "service_name=my-ner-service" \
-            -var "image_name=${{ env.IMAGE_NAME }}"
+          make terraform-plan
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_MODEL_NAME: ${{ secrets.GCP_MODEL_NAME }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
 
-      # 9. Terraform Apply
+      # 11. Terraform Apply
       - name: Terraform apply
         working-directory: ./infra
         run: |
-          terraform apply -auto-approve \
-            -var "project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var "region=us-central1" \
-            -var "service_name=my-ner-service" \
-            -var "image_name=${{ env.IMAGE_NAME }}"
+          make terraform-apply
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_MODEL_NAME: ${{ secrets.GCP_MODEL_NAME }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+
+      # Run setup before deployment
+      - name: Setup GCP resources
+        run: make setup-gcp
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+
+      # Run full deployment
+      - name: Deploy
+        run: make deploy
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_MODEL_NAME: ${{ secrets.GCP_MODEL_NAME }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+
+      # Validate deployment
+      - name: Validate deployment
+        run: |
+          sleep 30  # Wait for deployment to stabilize
+          make test-health
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
