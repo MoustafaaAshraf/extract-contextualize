@@ -20,7 +20,7 @@ run: ## Run the app
 	@ ${POETRY} run uvicorn src.app:app --reload
 
 build-image: ## Build the image
-	@ docker build -t gcr.io/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}:latest .
+	@ docker build -t ${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest .
 
 setup-gcp: ## Setup GCP resources needed before Terraform
 	@ echo "Enabling required GCP APIs..."
@@ -65,7 +65,7 @@ setup-gcp: ## Setup GCP resources needed before Terraform
 	@ echo "Setup completed successfully!"
 
 push-image: ## Push the image
-	@ docker push gcr.io/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}:latest
+	@ docker push ${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest
 
 terraform-init: ## Initialize Terraform
 	@ terraform init
