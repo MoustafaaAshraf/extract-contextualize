@@ -64,6 +64,9 @@ setup-gcp: ## Setup GCP resources needed before Terraform
 	@ gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
 		--member="serviceAccount:github-actions@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
 		--role="roles/iam.serviceAccountTokenCreator"
+	@ gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
+		--member="serviceAccount:github-actions@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+		--role="roles/artifactregistry.admin"
 
 	@ echo "Setup completed successfully!"
 

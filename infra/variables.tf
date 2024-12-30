@@ -6,7 +6,7 @@ variable "project_id" {
 variable "region" {
     description = "The region to deploy to"
     type        = string
-    default     = "us-central1"
+    default     = "europe-west2"
 }
 
 variable "service_name" {
@@ -33,11 +33,11 @@ variable "env_vars" {
 variable "memory_limit" {
     description = "Memory limit for the container"
     type        = string
-    default     = "2Gi"
+    default     = "4Gi"
 }
 
 variable "cpu_limit" {
     description = "CPU limit for the container"
     type        = string
-    default     = "1"
+    default     = "2"
 }

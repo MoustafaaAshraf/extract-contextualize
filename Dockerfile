@@ -22,7 +22,7 @@ COPY src/ src/
 EXPOSE 8080
 
 # Start the FastAPI application using uvicorn server:
-# - main:app: refers to the FastAPI instance in main.py
+# - src.app:app: refers to the FastAPI instance in src/app.py
 # - --host 0.0.0.0: allows connections from any IP
 # - --port 8080: runs the server on port 8080
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -102,22 +102,6 @@ jobs:
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
           GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
-      # After terraform apply
-      - name: Get Container Logs
-        if: failure()
-        run: |
-          SERVICE_NAME="medical-entity-extraction"
-          REGION="${{ secrets.GCP_LOCATION }}"
-          
-          echo "Fetching Cloud Run logs..."
-          gcloud run services describe $SERVICE_NAME \
-            --region=$REGION \
-            --format='get(status.url)'
-          
-          gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=$SERVICE_NAME" \
-            --limit=50 \
-            --format="table(timestamp,textPayload)"
-
       # # Run setup before deployment
       # - name: Setup GCP resources
       #   run: make setup-gcp
