@@ -1,5 +1,5 @@
 # Deploy a Cloud Run service
-resource "google_cloud_run_service" "default" {
+resource "google_cloud_run_service" "medical_entity_extraction_service" {
     name     = var.service_name
     location = var.region
 
@@ -8,18 +8,20 @@ resource "google_cloud_run_service" "default" {
         containers {
             image = var.image_name
             
-            # Example resource config
             resources {
             limits = {
-                memory = "512Mi"
-                cpu    = "1"
+                memory = var.memory_limit
+                cpu    = var.cpu_limit
             }
             }
 
-            # Optional environment variables
-            env {
-            name  = "ENVIRONMENT"
-            value = "production"
+            # Dynamic environment variables
+            dynamic "env" {
+            for_each = var.env_vars
+            content {
+                name  = env.key
+                value = env.value
+            }
             }
         }
         }
@@ -29,16 +31,13 @@ resource "google_cloud_run_service" "default" {
         percent         = 100
         latest_revision = true
     }
-
-    # Make it publicly accessible
-    autogenerate_revision_name = true
 }
 
 # Allow unauthenticated access
 resource "google_cloud_run_service_iam_member" "noauth" {
-    location        = google_cloud_run_service.default.location
-    project         = var.project_id
-    service         = google_cloud_run_service.default.name
-    role            = "roles/run.invoker"
-    member          = "allUsers"
+    location = google_cloud_run_service.medical_entity_extraction_service.location
+    project  = var.project_id
+    service  = google_cloud_run_service.medical_entity_extraction_service.name
+    role     = "roles/run.invoker"
+    member   = "allUsers"
 }
