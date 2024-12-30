@@ -82,7 +82,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          GCP_MODEL_NAME: ${{ secrets.GCP_MODEL_NAME }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
 
       # 10. Terraform Apply
@@ -93,7 +92,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          GCP_MODEL_NAME: ${{ secrets.GCP_MODEL_NAME }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
 
       # # Run setup before deployment

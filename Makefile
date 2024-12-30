@@ -76,13 +76,13 @@ terraform-init: ## Initialize Terraform
 terraform-plan: ## Plan Terraform
 	@ terraform plan \
 		-var="project_id=${GCP_PROJECT_ID}" \
-		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
-		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_MODEL_NAME":"${GCP_MODEL_NAME}","GCP_LOCATION":"${GCP_LOCATION}"}'
+		-var="image_name=${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
+		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 terraform-apply: ## Apply Terraform
 	@ terraform apply \
 		-var="project_id=${GCP_PROJECT_ID}" \
-		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
+		-var="image_name=${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 test-health: ## Test health endpoint
