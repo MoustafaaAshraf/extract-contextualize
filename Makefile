@@ -20,7 +20,7 @@ run: ## Run the app
 	@ ${POETRY} run uvicorn src.app:app --reload
 
 build-image: ## Build the image
-	@ docker build -t gcr.io/${GCP_PROJECT_ID}/medical-entity-extraction-repo:latest .
+	@ docker build -t gcr.io/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}:latest .
 
 setup-gcp: ## Setup GCP resources needed before Terraform
 	@ echo "Enabling required GCP APIs..."
@@ -30,7 +30,7 @@ setup-gcp: ## Setup GCP resources needed before Terraform
 	@ gcloud services enable aiplatform.googleapis.com
 
 	@ echo "Creating Artifact Registry repository..."
-	@ gcloud artifacts repositories create medical-entity-extraction-repo \
+	@ gcloud artifacts repositories create ${GCP_REPOSITORY_NAME} \
 		--repository-format=docker \
 		--location=${GCP_LOCATION} \
 		--description="Docker repository for medical entity extraction" \
@@ -65,7 +65,7 @@ setup-gcp: ## Setup GCP resources needed before Terraform
 	@ echo "Setup completed successfully!"
 
 push-image: ## Push the image
-	@ docker push gcr.io/${GCP_PROJECT_ID}/medical-entity-extraction-repo:latest
+	@ docker push gcr.io/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}:latest
 
 terraform-init: ## Initialize Terraform
 	@ terraform init
@@ -73,13 +73,13 @@ terraform-init: ## Initialize Terraform
 terraform-plan: ## Plan Terraform
 	@ terraform plan \
 		-var="project_id=${GCP_PROJECT_ID}" \
-		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/medical-entity-extraction-repo/api:latest" \
+		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_MODEL_NAME":"${GCP_MODEL_NAME}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 terraform-apply: ## Apply Terraform
 	@ terraform apply \
 		-var="project_id=${GCP_PROJECT_ID}" \
-		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/medical-entity-extraction-repo/api:latest" \
+		-var="image_name=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 test-health: ## Test health endpoint
