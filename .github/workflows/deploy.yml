@@ -46,7 +46,16 @@ jobs:
         run: |
           gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev --quiet
 
-      # 5. Build Docker image
+      # 5. Free disk space
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          docker system prune -af
+
+      # 6. Build Docker image
       - name: Build Docker image
         run: |
           IMAGE_NAME="${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:${{ github.sha }}"
@@ -57,24 +66,24 @@ jobs:
           docker tag "$IMAGE_NAME" ${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:latest
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      # 6. Push Docker image to Artifact Registry
+      # 7. Push Docker image to Artifact Registry
       - name: Push Docker image
         run: |
           docker push ${{ env.IMAGE_NAME }}
           docker push ${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:latest
 
-      # 7. Set up Terraform
+      # 8. Set up Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # 8. Terraform Init
+      # 9. Terraform Init
       - name: Terraform init
         working-directory: ./infra
         run: terraform init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
 
-      # 9. Terraform Plan
+      # 10. Terraform Plan
       - name: Terraform plan
         working-directory: ./infra
         run: |
@@ -84,7 +93,7 @@ jobs:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
 
-      # 10. Terraform Apply
+      # 11. Terraform Apply
       - name: Terraform apply
         working-directory: ./infra
         run: |
