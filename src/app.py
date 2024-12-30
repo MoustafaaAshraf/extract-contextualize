@@ -1,7 +1,7 @@
 from src import PDFParser
 from src import Extractor
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Response, status
 from typing import List
 from pydantic import BaseModel
 import uvicorn
@@ -157,7 +157,7 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return Response(status_code=status.HTTP_200_OK)
 
 
 if __name__ == "__main__":

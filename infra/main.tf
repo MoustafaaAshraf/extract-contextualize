@@ -20,10 +20,10 @@ resource "google_cloud_run_service" "medical_entity_extraction_service" {
                     http_get {
                         path = "/health"
                     }
-                    initial_delay_seconds = 10
-                    timeout_seconds = 3
-                    period_seconds = 5
-                    failure_threshold = 3
+                    initial_delay_seconds = 30
+                    timeout_seconds = 5
+                    period_seconds = 10
+                    failure_threshold = 5
                 }
 
                 # Add environment variables
