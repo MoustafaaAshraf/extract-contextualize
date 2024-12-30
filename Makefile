@@ -71,7 +71,9 @@ push-image: ## Push the image
 	@ docker push ${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest
 
 terraform-init: ## Initialize Terraform
-	@ cd infra && terraform init
+	@ cd infra && terraform init \
+		-backend-config="bucket=${GCP_PROJECT_ID}-terraform-state" \
+		-backend-config="prefix=terraform/state"
 
 terraform-plan: ## Plan Terraform
 	@ cd infra && terraform plan \
@@ -80,7 +82,7 @@ terraform-plan: ## Plan Terraform
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'
 
 terraform-apply: ## Apply Terraform
-	@ cd infra && terraform apply \
+	@ cd infra && terraform apply -auto-approve \
 		-var="project_id=${GCP_PROJECT_ID}" \
 		-var="image_name=${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_REPOSITORY_NAME}/api:latest" \
 		-var='env_vars={"GCP_PROJECT_ID":"${GCP_PROJECT_ID}","GCP_LOCATION":"${GCP_LOCATION}"}'

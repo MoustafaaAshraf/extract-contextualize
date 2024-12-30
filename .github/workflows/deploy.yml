@@ -78,15 +78,14 @@ jobs:
 
       # 9. Terraform Init
       - name: Terraform init
-        run: |
-          cd infra && make terraform-init
+        run: make terraform-init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
 
       # 10. Terraform Plan
       - name: Terraform plan
-        run: |
-          make terraform-plan
+        run: make terraform-plan
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -95,8 +94,7 @@ jobs:
 
       # 11. Terraform Apply
       - name: Terraform apply
-        run: |
-          make terraform-apply
+        run: make terraform-apply
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
