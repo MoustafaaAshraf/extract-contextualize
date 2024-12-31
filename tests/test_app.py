@@ -1,16 +1,13 @@
 from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
-from src.app import app
-import os
 from unittest.mock import patch
 
-client = TestClient(app)
+# Apply the patch before importing the app
+with patch('vertexai.init'):
+    from src.app import app
 
-@pytest.fixture(autouse=True)
-def mock_vertex_ai():
-    with patch('vertexai.init') as mock:
-        yield mock
+client = TestClient(app)
 
 @pytest.fixture
 def mock_extractor():
