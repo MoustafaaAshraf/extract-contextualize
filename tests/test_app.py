@@ -7,6 +7,11 @@ from unittest.mock import patch
 
 client = TestClient(app)
 
+@pytest.fixture(autouse=True)
+def mock_vertex_ai():
+    with patch('vertexai.init') as mock:
+        yield mock
+
 @pytest.fixture
 def mock_extractor():
     with patch('src.app.Extractor') as mock:
