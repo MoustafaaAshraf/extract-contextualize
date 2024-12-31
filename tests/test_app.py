@@ -1,38 +1,49 @@
 from pathlib import Path
+import os
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
 
-# Create multiple patches before importing the app
+# 1. Mock Configuration
+mock_config = MagicMock()
+mock_config.project = "test-project"
+mock_config.location = "test-location"
+
+# 3. Patch Definitions
 patches = [
+    # Prevents actual VertexAI initialization
     patch('vertexai.init'),
-    patch('vertexai.generative_models.GenerativeModel', return_value=MagicMock())
+    # Provides a mock model instead of real VertexAI model
+    patch('vertexai.generative_models.GenerativeModel', return_value=MagicMock()),
+    # Replaces VertexAI global configuration
+    patch('google.cloud.aiplatform.initializer.global_config', mock_config),
+    # Prevents actual GCP authentication
+    patch('google.auth.default', return_value=(MagicMock(), "test-project"))
 ]
 
-# Apply all patches
+# 4. Apply Patches Before Import
 for p in patches:
     p.start()
 
-# Now import the app
+# 5. Import App Under Test
 from src.app import app
 
-# Stop patches after import
+# 6. Clean Up Patches
 for p in patches:
     p.stop()
 
 client = TestClient(app)
 
+# 7. Test Fixtures
 @pytest.fixture
 def mock_extractor():
     with patch('src.app.Extractor') as mock:
         yield mock
 
+# 8. Test Cases
 def test_extract_empty_file():
-    # Test with no file
     response = client.post("/api/v1/extract")
-    assert (
-        response.status_code == 422
-    )
+    assert response.status_code == 422
 
 def test_extract_invalid_file():
     # Test with non-PDF file
