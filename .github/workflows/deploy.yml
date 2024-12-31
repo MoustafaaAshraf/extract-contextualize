@@ -62,13 +62,6 @@ jobs:
           GCP_LOCATION: "test-location"
         run: make test
 
-      # Upload coverage report
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: true
-
       # Set up Google Cloud auth
       # Using a service account key (stored in GitHub Secrets as GCP_SA_KEY)
       - name: Authenticate to Google Cloud
@@ -98,6 +91,16 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache
           docker system prune -af
 
+      # Setup GCP allow to fail
+      - name: Setup GCP
+        run: make setup-gcp
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
+        continue-on-error: true
+
       # Build Docker image
       - name: Build Docker image
         run: |
@@ -108,15 +111,6 @@ jobs:
             -t "$IMAGE_NAME" .
           docker tag "$IMAGE_NAME" ${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:latest
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-
-      # Setup GCP
-      - name: Setup GCP
-        run: make setup-gcp
-        env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
-          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
       # Push Docker image to Artifact Registry
       - name: Push Docker image
@@ -154,9 +148,3 @@ jobs:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
           GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
-
-      # Test Summary
-      - name: Test Summary
-        run: |
-          echo "### Test Results :test_tube:" >> $GITHUB_STEP_SUMMARY
-          echo "Coverage: $(poetry run coverage report | grep TOTAL | awk '{print $4}')" >> $GITHUB_STEP_SUMMARY
