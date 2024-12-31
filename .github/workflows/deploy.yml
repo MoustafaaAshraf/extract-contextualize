@@ -56,6 +56,10 @@ jobs:
 
       # Run tests
       - name: Run tests
+        env:
+          GCP_MODEL_NAME: "test-model"
+          GCP_PROJECT_ID: "test-project"
+          GCP_LOCATION: "test-location"
         run: make test
 
       # Upload coverage report
