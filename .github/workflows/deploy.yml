@@ -20,20 +20,20 @@ jobs:
 
     steps:
 
-      # 1. Check out code
+      # Check out code
       - name: Check out source code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # 2. Set up Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      # 3. Install Poetry
+      # Install Poetry
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
@@ -41,7 +41,7 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
-      # 4. Load cached dependencies
+      # Load cached dependencies
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v3
@@ -49,12 +49,12 @@ jobs:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
-      # 5. Install dependencies
+      # Install dependencies
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --no-root
 
-      # 6. Run tests
+      # Run tests
       - name: Run tests
         run: |
           mkdir -p tests/test_files
@@ -62,14 +62,14 @@ jobs:
           echo "Invalid content" > tests/test_files/invalidExtension.txt
           poetry run pytest --cov=src --cov-report=xml
 
-      # 7. Upload coverage report
+      # Upload coverage report
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           fail_ci_if_error: true
 
-      # 8. Set up Google Cloud auth
+      # Set up Google Cloud auth
       # Using a service account key (stored in GitHub Secrets as GCP_SA_KEY)
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
@@ -77,19 +77,19 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           token_format: 'access_token'
 
-      # 9. Set up Cloud SDK
+      # Set up Cloud SDK
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           version: '>= 363.0.0'
           install_components: 'beta,kubectl'
 
-      # 10. Configure Docker to use Artifact Registry
+      # Configure Docker to use Artifact Registry
       - name: Configure docker to use Artifact Registry
         run: |
           gcloud auth configure-docker ${{ secrets.GCP_LOCATION }}-docker.pkg.dev --quiet
 
-      # 11. Free disk space
+      # Free disk space
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -98,7 +98,7 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache
           docker system prune -af
 
-      # 12. Build Docker image
+      # Build Docker image
       - name: Build Docker image
         run: |
           IMAGE_NAME="${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:${{ github.sha }}"
@@ -109,25 +109,35 @@ jobs:
           docker tag "$IMAGE_NAME" ${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:latest
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      # 13. Push Docker image to Artifact Registry
+      # Setup GCP
+      - name: Setup GCP
+        run: make setup-gcp
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
+
+      # Push Docker image to Artifact Registry
       - name: Push Docker image
         run: |
           docker push ${{ env.IMAGE_NAME }}
           docker push ${{ secrets.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY_NAME }}/api:latest
 
-      # 14. Set up Terraform
+      # Set up Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # 15. Terraform Init
+      # Terraform Init
       - name: Terraform init
         run: make terraform-init
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
+          GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
-      # 16. Terraform Plan
+      # Terraform Plan
       - name: Terraform plan
         run: make terraform-plan
         env:
@@ -136,7 +146,7 @@ jobs:
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
           GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
-      # 17. Terraform Apply
+      # Terraform Apply
       - name: Terraform apply
         run: make terraform-apply
         env:
@@ -145,7 +155,7 @@ jobs:
           GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
           GCP_REPOSITORY_NAME: ${{ secrets.GCP_REPOSITORY_NAME }}
 
-      # 18. Test Summary
+      # Test Summary
       - name: Test Summary
         run: |
           echo "### Test Results :test_tube:" >> $GITHUB_STEP_SUMMARY
