@@ -1,0 +1,117 @@
+,Pattern,Sub Pattern,LeetCode Problem,NeetCode,Tip,Date,Sub-Pattern,Problem
+0,HashSet,Uniqueness and Duplicate Detection,Contains Duplicate,1.0,,,Set for Duplicates and Uniques,Contains Duplicate
+1,Fixed-Size Sliding Window,Fixed-Size Sliding Window,Contains Duplicate II,1.0,,,,
+2,HashSet,Uniqueness and Duplicate Detection,Contains Duplicate III,0.0,,,,
+3,Array Manipulation,Uniqueness and Duplicate Detection,Find All Duplicates in an Array,1.0,Mark seen by using values as indices,,Array Manipulation,Find All Duplicates in an Array
+4,HashSet,Uniqueness and Duplicate Detection,Set Mismatch,1.0,Mark seen by using values as indices,,Hash Table for Counting and Mapping,Set Mismatch
+5,HashSet,Subarray and Substring Problems,Minimum Window Substring,,Hard,,,
+6,HashSet,Subarray and Substring Problems,Longest Duplicate Substring,,Hard,,,
+7,HashMap,Subarray and Substring Problems,Largest Substring Between Two Equal Characters,,,,String Manipulation within Arrays,Largest Substring Between Two Equal Characters
+8,Fixed-Size Sliding Window,Hashset,Repeated DNA Sequences,1.0,two sets,,Hash Table for Counting and Mapping,Repeated DNA Sequences
+9,HashSet,Subarray and Substring Problems,Check if a String Contains all Binary Codes of Size K,1.0,How to create the lookup binary representations,,Hash Set for Duplicates and Uniques,Check if a String Contains all Binary Codes of Size K
+10,HashMap,Two-Pointer Optimization,Two Sum,,map value to index,,Hash Table for Counting and Mapping,Two Sum
+11,HashSet,Two-Pointer Optimization,Two Sum III - Data structure design,,,,,
+12,Stack,,Minimum Number of Swaps to Make The String Balanced,1.0,,,String Manipulation within Arrays,Minimum Number of Swaps to Make The String Balanced
+13,HashSet,Set Operations and Combinations,Happy Number,,good exercise for % and //,,,
+14,Array Manipulation,,Concatenation of Array,,,,Array Manipulation,Concatenation of Array
+15,HashSet,Set Operations and Combinations,Intersection of Two Arrays,,,,Hash Set for Duplicates and Uniques,Intersection of Two Arrays
+16,HashSet,Set Operations and Combinations,Intersection of Two Arrays II,,,,,
+17,HashSet,Set Operations and Combinations,Find the Difference of Two Arrays,,,,Hash Set for Duplicates and Uniques,Find the Difference of Two Arrays
+18,Heap,Frequency Counting,Top K Frequent Elements,,,,Hash Table for Counting and Mapping,Top K Frequent Elements
+19,Arrays,Boyer-Moore Voting Algorithm,Majority Element,,,25-Nov-2024,Frequency and Counting Problems,Majority Element
+20,Arrays,Boyer-Moore Voting Algorithm,Majority Element II,,,25-Nov-2024,Frequency and Counting Problems,Majority Element II
+21,Arrays,Subarray and Substring Problems,Number of Zero-Filled Subarrays,1.0,"at each zero, increment this count and add it to the total",25-Nov-2024,Subarray and Subsequence Problems,Number of Zero-Filled Subarrays
+22,Heap,Frequency Counting,Sort Characters By Frequency,1.0,,25-Nov-2024,Hash Table for Counting and Mapping,Sort Characters By Frequency
+23,HashMap,Grouping and Partitioning,Group Shifted Strings,,How to hash length and range between chars of a string?,25-Nov-2024,,
+24,Arrays,Grouping and Partitioning,Group The People Given the Group Size They Belong To,,greedy filling and clearing and refilling,25-Nov-2024,,
+25,HashMap,Grouping and Partitioning,Word Pattern,,2 dicts,25-Nov-2024,Hash Table for Counting and Mapping,Word Pattern
+26,HashSet,Mapping Characters to Indices/Positions,Longest Consecutive Sequence,,Is an element a start of a sequence?,25-Nov-2024,Hash Set for Duplicates and Uniques,Longest Consecutive Sequence
+27,HashMap,Mapping Characters to Indices/Positions,Find the Index of the First Occurrence in a String,1.0,Lots of slicing,26-Nov,,
+28,Fixed-Size Sliding Window,Frequency Counting,Find All Anagrams in a String,1.0,Slicing,26-Nov,Sliding Window,Find All Anagrams in a String
+29,Prefix-Sum,Hashmap,Contiguous Array,1.0,"Vote for either element, when vote equal/zero that's an event",26-Nov,Prefix Sum and Hash Map,Contiguous Array
+30,Same Direction Pointers,,Is Subsequence,1.0,,26-Nov,Two Pointers Technique,Is Subsequence
+31,Frequency Counting,Frequency Counting,Permutation in String,1.0,,26-Nov,,
+32,HashMap,Counting Pairs and Triplets,Number of Pairs of Interchangeable Rectangles,,,,Hash Table for Counting and Mapping,Number of Pairs of Interchangeable Rectangles
+33,HashMap,Counting Pairs and Triplets,Count Good Pairs,,,,,
+34,HashMap,Counting Pairs and Triplets,3Sum Smaller,,,,,
+35,HashMap,Counting Pairs and Triplets,Count of Range Sum,,,,,
+36,HashMap,Counting Pairs and Triplets,Pairs of Songs With Total Durations Divisible by 60,,,,,
+37,HashMap,Counting Pairs and Triplets,Number of Boomerangs,,,,,
+38,HashMap,Counting Pairs and Triplets,Number of Pairs of Interchangeable Rectangles,,,,Hash Table for Counting and Mapping,Number of Pairs of Interchangeable Rectangles
+39,Frequency Counting,Anagram and Permutation Detection,Valid Anagram,,,,Hash Table for Counting and Mapping,Valid Anagram
+40,Frequency Counting,Anagram and Permutation Detection,Anagram Mappings,,,,,
+41,Frequency Counting,Anagram and Permutation Detection,Group Anagrams,,,,Hash Table for Counting and Mapping,Group Anagrams
+42,Frequency Counting,Anagram and Permutation Detection,Find All Anagrams in a String,,,,Sliding Window,Find All Anagrams in a String
+43,Frequency Counting,Character and Element Frequency Analysis,First Unique Character in a String,,,,Hash Table for Counting and Mapping,First Unique Character in a String
+44,Frequency Counting,Character and Element Frequency Analysis,Rearrange String k Distance Apart,,,,,
+45,Frequency Counting,Character and Element Frequency Analysis,Minimum Window Substring,,,,,
+46,Frequency Counting,Character and Element Frequency Analysis,All O`one Data Structure,,,,,
+47,Frequency Counting,Character and Element Frequency Analysis,Maximum Number of Balloons,,,,Hash Table for Counting and Mapping,Maximum Number of Balloons
+48,Array Manipulation	,,Replace Elements With Greatest Element On Right Side,,,,Array Manipulation,Replace Elements With Greatest Element On Right Side
+49,Frequency Counting,Counting Elements with Specific Properties,Degree of an Array,,,,,
+50,Frequency Counting,Counting Elements with Specific Properties,Find All Anagrams in a String,,,,Sliding Window,Find All Anagrams in a String
+51,Frequency Counting,Counting Elements with Specific Properties,Longest Harmonious Subsequence,,,,,
+52,Frequency Counting,Counting Elements with Specific Properties,Element Appearing More Than 25% In Sorted Array,,,,,
+53,Frequency Counting,Counting Elements with Specific Properties,Redistribute Characters to Make All Strings Equal,,,,Hash Table for Counting and Mapping,Redistribute Characters to Make All Strings Equal
+54,Frequency Counting,Sliding Window with Frequency Constraints,Longest Substring with At Most K Distinct Characters,,,,,
+55,Frequency Counting,Sliding Window with Frequency Constraints,Fruit Into Baskets,,,,,
+56,Frequency Counting,Sliding Window with Frequency Constraints,Sliding Window Maximum,,,,,
+57,Frequency Counting,Sliding Window with Frequency Constraints,Optimal Partition of String,,,,Hash Set for Duplicates and Uniques,Optimal Partition of String
+58,Frequency Counting,Histogram-Based Problems,Relative Ranks,,,,,
+59,Frequency Counting,Histogram-Based Problems,Frequency Sort,,,,,
+60,Combined Patterns,Sliding Window with Frequency Maps,Minimum Window Substring,,,,,
+61,Combined Patterns,Sliding Window with Frequency Maps,Longest Substring with At Least K Repeating Characters,,,,,
+62,Combined Patterns,Sliding Window with Frequency Maps,Substring with Concatenation of All Words,,,,,
+63,Combined Patterns,Sliding Window with Frequency Maps,Sliding Window Median,,,,,
+64,Combined Patterns,Sliding Window with Frequency Maps,Find All Anagrams in a String,,,,Sliding Window,Find All Anagrams in a String
+65,Combined Patterns,Two-Pointer with HashMap,Longest Substring with At Most Two Distinct Characters,,,,,
+66,Combined Patterns,Two-Pointer with HashMap,Sliding Window Maximum,,,,,
+67,Combined Patterns,Two-Pointer with HashMap,Longest Subarray of 1's After Deleting One Element,,,,,
+68,Combined Patterns,Two-Pointer with HashMap,Minimum Size Subarray Sum,,,,,
+69,Array Manipulation,,Replace Elements With Greatest Element On Right Side,,,,Array Manipulation,Replace Elements With Greatest Element On Right Side
+70,Array Manipulation,,Maximum Product Difference Between Two Pairs,,,,,
+71,Array Manipulation,,Sort Colors,,,,Two Pointers Technique,Sort Colors
+72,Array Manipulation,,Non Decreasing Array,,,,Array Manipulation,Non Decreasing Array
+73,Array Manipulation,,Wiggle Sort,,,,Sorting and Rearrangement,Wiggle Sort
+74,Array Manipulation,,Sort an Array,,,,Sorting and Searching,Sort an Array
+75,Array Manipulation,,Optimal Partition of String,,,,Hash Set for Duplicates and Uniques,Optimal Partition of String
+76,String Manipulation,,Length of Last Word,,,,String Manipulation within Arrays,Length of Last Word
+77,String Manipulation,,Longest Common Prefix,,,,String Manipulation within Arrays,Longest Common Prefix
+78,String Manipulation,,Valid Sudoku,,,,Hash Table for Counting and Mapping,Valid Sudoku
+79,String Manipulation,,Text Justification,,Hard,,String Manipulation within Arrays,Text Justification
+80,Design Problems,,Design HashSet,,,,Design Data Structures,Design HashSet
+81,Design Problems,,Design HashMap,,,,Design Data Structures,Design HashMap
+82,Design Problems,,Insert Delete Get Random O(1),,,,Design Data Structures,Insert Delete Get Random O(1)
+83,Design Problems,,Encode and Decode Strings,,,,String Manipulation within Arrays,Encode and Decode Strings
+84,Design Problems,,Encode and Decode TinyURL,,,,Design Data Structures,Encode and Decode TinyURL
+85,Design Problems,,Design Parking System,,,,Design Data Structures,Design Parking System
+86,Design Problems,,Design Underground System,,,,Design Data Structures,Design Underground System
+87,Design Problems,,Design a Food Rating System,,,,Design Data Structures,Design a Food Rating System
+88,Others,,Pascal's Triangle,,,,Array Generation and Manipulation,Pascal's Triangle
+89,Others,,Pascal's Triangle II,,,,Array Generation and Manipulation,Pascal's Triangle II
+90,Others,,Path Crossing,,,,Hash Set for Duplicates and Uniques,Path Crossing
+91,Others,,Destination City,,,,Hash Table for Counting and Mapping,Destination City
+92,Others,,Largest Number,,,,Sorting and String Manipulation,Largest Number
+93,Fixed-Size Sliding Window,,Sequential Digits,1.0,"Do it again, it's just beautiful. Each length, is a window size",27-Nov,Math with Arrays,Sequential Digits
+94,Stacks,,Minimum Remove to Make Valid Parentheses,1.0,,26-Nov,String Manipulation within Arrays,Minimum Remove to Make Valid Parentheses
+95,Arrays,,Minimum Changes To Make Alternating Binary String,1.0,"Which is less, casting it as a alternating starting with 0 or 1?",26-Nov,String Manipulation within Arrays,Minimum Changes To Make Alternating Binary String
+96,Others,,Convert an Array Into a 2D Array With Conditions,,,,Array Manipulation,Convert an Array Into a 2D Array With Conditions
+97,Others,,Minimum Numbers of Operations to Make Array Empty,,,,Greedy Algorithm with Arrays,Minimum Numbers of Operations to Make Array Empty
+98,Fixed-Size Sliding Window,,Divide Array Into Arrays With Max Difference,1.0,I would always ask myself do I need to sort any given array?,27-Nov,Array Manipulation,Divide Array Into Arrays With Max Difference
+99,Prefix-Sum,,Find Polygon with the Largest Perimeter,1.0,Greedy,27-Nov,Sorting and Searching,Find Polygon with the Largest Perimeter
+100,Others,,Number of Submatrices that Sum to Target,,,,Prefix Sum,Number of Submatrices that Sum to Target
+101,Others,,Largest 3-Same-Digit Number in String,,,,String Manipulation within Arrays,Largest 3-Same-Digit Number in String
+102,Others,,Find Words That Can Be Formed by Characters,,,,Hash Table for Counting and Mapping,Find Words That Can Be Formed by Characters
+103,Others,,Path Crossing,,,,Hash Set for Duplicates and Uniques,Path Crossing
+104,Others,,Time Needed to Buy Tickets,,,,Array Manipulation,Time Needed to Buy Tickets
+105,Others,,Number of Students Unable to Eat Lunch,,,,Array Manipulation,Number of Students Unable to Eat Lunch
+106,Others,,Special Array with X Elements Greater than or Equal X,,,,Array Manipulation,Special Array with X Elements Greater than or Equal X
+107,Others,,Unique Email Addresses,,,,String Manipulation within Arrays,Unique Email Addresses
+108,Others,,Isomorphic Strings,,,,Hash Table for Counting and Mapping,Isomorphic Strings
+109,Arrays,,Can Place Flowers,,,,Greedy Algorithm with Arrays,Can Place Flowers
+110,Others,,Find Pivot Index,,,,Prefix Sum,Find Pivot Index
+111,Others,,Largest Substring Between Two Equal Characters,,,,String Manipulation within Arrays,Largest Substring Between Two Equal Characters
+112,Others,,Number of Good Pairs,,,,Frequency and Counting Problems,Number of Good Pairs
+113,Others,,Largest Number,,,,Sorting and String Manipulation,Largest Number
+114,Others,,Continuous Subarray Sum,,,,Prefix Sum,Continuous Subarray Sum
+115,Others,,Push Dominoes,,,,String Manipulation within Arrays,Push Dominoes
