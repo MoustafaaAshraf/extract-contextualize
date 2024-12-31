@@ -4,7 +4,6 @@ from src import Entity
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Response, status
 from typing import List
-from pydantic import BaseModel
 import uvicorn
 import tempfile
 from loguru import logger
@@ -29,6 +28,7 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
+
 
 @app.post(
     "/api/v1/extract",
@@ -59,15 +59,21 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
             - 500: For unexpected server errors
     """
     try:
-        # The file argument isn't optional, however FastAPI doesn't enforce it, which I doubt...
+        # The file argument isn't optional, however FastAPI doesn't enforce it,
+        # which I doubt...
         if not file:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided"
+            )
         # a file was uploaded but the filename was somehow stripped or corrupted
         if not file.filename:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No filename provided")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="No filename provided"
+            )
 
         # Validate the file type
-        # TODO: This is a bit of a hack, but it's a quick fix. Is there a better way to do this?
+        # TODO: This is a bit of a hack, but it's a quick fix. Is there a better
+        # way to do this?
         if not file.filename.lower().endswith(".pdf"):
             raise HTTPException(
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
@@ -81,11 +87,14 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
             if len(content) > 30 * 1024 * 1024:
                 raise HTTPException(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    detail="File size too large. Maximum size is 30MB"
+                    detail="File size too large. Maximum size is 30MB",
                 )
         except Exception as e:
             logger.error(f"Error reading file: {e}")
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error reading file content")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error reading file content",
+            )
 
         # Process PDF file
         try:
@@ -109,7 +118,10 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
                     )
         except Exception as e:
             logger.error(f"PDF parsing error: {e}")
-            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Failed to parse PDF content")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Failed to parse PDF content",
+            )
         finally:
             # Clean up temporary file
             try:
@@ -133,7 +145,7 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
             logger.error(f"Entity extraction error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to extract entities from document"
+                detail="Failed to extract entities from document",
             )
 
     except HTTPException as e:

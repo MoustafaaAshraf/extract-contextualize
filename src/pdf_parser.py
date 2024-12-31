@@ -5,6 +5,7 @@ from pathlib import Path
 
 logger = logger.bind(name="pdf_parser")
 
+
 class PDFParser:
     def __init__(self) -> None:
         self.last_parsed = None
@@ -28,7 +29,7 @@ class PDFParser:
             RuntimeError: If PDF parsing fails for any other reason.
         """
         self.last_parsed = file_path
-        
+
         try:
             return self._extract_text(file_path)
         except FileNotFoundError as e:
@@ -43,38 +44,38 @@ class PDFParser:
 
     def _extract_text(self, file_path: Path) -> str:
         """Extract text from PDF file page by page.
-        
+
         Args:
             file_path (Path): Path to the PDF file
-            
+
         Returns:
             str: Extracted text from all pages
         """
         all_text: List[str] = []
-        
+
         with pdfplumber.open(file_path) as pdf:
             if not pdf.pages:
                 logger.warning(f"PDF file contains no pages: {file_path}")
                 return ""
-            
+
             for page_num, page in enumerate(pdf.pages, 1):
                 try:
                     logger.debug(f"Processing page {page_num}/{len(pdf.pages)}")
                     text: Optional[str] = page.extract_text()
-                    
+
                     if text:
                         all_text.append(text)
                     else:
                         logger.warning(f"No text extracted from page {page_num}")
-                        
+
                 except Exception as e:
                     logger.error(f"Error processing page {page_num}: {e}")
                     continue
-                
+
         if not all_text:
             logger.warning("No text could be extracted from any page")
             return ""
-        
+
         result = "\n".join(all_text)
         logger.info(
             f"Successfully extracted {len(result)} characters "

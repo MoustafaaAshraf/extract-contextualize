@@ -12,13 +12,13 @@ mock_config.location = "test-location"
 # 3. Patch Definitions
 patches = [
     # Prevents actual VertexAI initialization
-    patch('vertexai.init'),
+    patch("vertexai.init"),
     # Provides a mock model instead of real VertexAI model
-    patch('vertexai.generative_models.GenerativeModel', return_value=MagicMock()),
+    patch("vertexai.generative_models.GenerativeModel", return_value=MagicMock()),
     # Replaces VertexAI global configuration
-    patch('google.cloud.aiplatform.initializer.global_config', mock_config),
+    patch("google.cloud.aiplatform.initializer.global_config", mock_config),
     # Prevents actual GCP authentication
-    patch('google.auth.default', return_value=(MagicMock(), "test-project"))
+    patch("google.auth.default", return_value=(MagicMock(), "test-project")),
 ]
 
 # 4. Apply Patches Before Import
@@ -34,16 +34,19 @@ for p in patches:
 
 client = TestClient(app)
 
+
 # 7. Test Fixtures
 @pytest.fixture
 def mock_extractor():
-    with patch('src.app.Extractor') as mock:
+    with patch("src.app.Extractor") as mock:
         yield mock
+
 
 # 8. Test Cases
 def test_extract_empty_file():
     response = client.post("/api/v1/extract")
     assert response.status_code == 422
+
 
 def test_extract_invalid_file():
     # Test with non-PDF file
