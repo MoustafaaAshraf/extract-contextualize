@@ -1,11 +1,24 @@
 from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-# Apply the patch before importing the app
-with patch('vertexai.init'):
-    from src.app import app
+# Create multiple patches before importing the app
+patches = [
+    patch('vertexai.init'),
+    patch('vertexai.generative_models.GenerativeModel', return_value=MagicMock())
+]
+
+# Apply all patches
+for p in patches:
+    p.start()
+
+# Now import the app
+from src.app import app
+
+# Stop patches after import
+for p in patches:
+    p.stop()
 
 client = TestClient(app)
 
