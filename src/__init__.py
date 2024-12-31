@@ -10,7 +10,8 @@ Modules:
 
 from .extractor import Extractor
 from .pdf_parser import PDFParser
+from .models import Entity
 
 __version__ = "1.0.0"
 __author__ = "Your Name"
-__all__ = ["Extractor", "PDFParser"]
+__all__ = ["Extractor", "PDFParser", "Entity"]
