@@ -3,8 +3,9 @@ import re
 from loguru import logger
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Iterator
 
+logger = logger.bind(name="extractor")
 
 class Extractor:
     """Class to extract entities from a text using a pre-trained model from Vertex AI model garden.
@@ -15,7 +16,7 @@ class Extractor:
         paragraphs: List of paragraphs extracted from the text
         entities: List of extracted entities
     """
-    def __init__(self, gcp_model_name: str, GCP_PROJECT_ID: str, gcp_location: str) -> None:
+    def __init__(self, GCP_MODEL_NAME: str, GCP_PROJECT_ID: str, GCP_LOCATION: str) -> None:
         """Initialize the Extractor with GCP credentials and model.
 
         Args:
@@ -28,18 +29,22 @@ class Extractor:
             RuntimeError: If Vertex AI initialization fails
         """
         # Validate input parameters
-        if not all([gcp_model_name, GCP_PROJECT_ID, gcp_location]):
+        if not all([GCP_MODEL_NAME, GCP_PROJECT_ID, GCP_LOCATION]):
             raise ValueError("All GCP parameters must be provided")
 
         try:
             # Initialize Vertex AI with GCP credentials
-            vertexai.init(project=GCP_PROJECT_ID, location=gcp_location)
+            vertexai.init(project=GCP_PROJECT_ID, location=GCP_LOCATION)
             # Initialize the generative model
-            self.model = GenerativeModel(gcp_model_name)
-            logger.info(f"Successfully initialized Vertex AI model: {gcp_model_name}")
+            self.model = GenerativeModel(GCP_MODEL_NAME)
+            logger.info(f"Successfully initialized Vertex AI model: {GCP_MODEL_NAME}")
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
             raise RuntimeError(f"Vertex AI initialization failed: {str(e)}")
+
+        self.text: Optional[str] = None
+        self.paragraphs: List[str] = []
+        self.entities: List[Dict[str, Any]] = []
 
     def extract_entities(self, text: str) -> List[Dict[str, Any]]:
         """Extracts entities from a text using the model.
@@ -67,16 +72,23 @@ class Extractor:
         try:
             # Store the input text
             self.text = text
-            # Split the text into manageable paragraphs
+            # Split the text into manageable paragraphs as a list of strings
             self.paragraphs = self.split_into_paragraphs(self.text)
-            # Process text to extract entities
+            # Process text to extract entities and return them as 
+            # a list of dictionaries
             self.entities = self.process_text()
 
-            # Handle potential JSON string response
+            # Handle JSON string response
             if isinstance(self.entities, str):
                 try:
+                    logger.debug(f"Parsing JSON response: {self.entities}")
                     return json.loads(self.entities)
                 except json.JSONDecodeError as e:
+                    # Just in-case, I think gemini is good at this
+                    # The initial plan was to find/finetune a model for this
+                    # but I think this is good enough for now, time is not
+                    # my friend right now and I want to get the job
+                    # quickly :D
                     logger.error(f"Failed to parse JSON response: {e}")
                     raise RuntimeError("Invalid JSON response from model")
             
@@ -105,6 +117,13 @@ class Extractor:
 
         try:
             # Split text on multiple newlines and clean each paragraph
+            # I'm not sure if this is the best way to do it, but it's good enough for now
+            # It's not optimal, as research paper have this weird format where they
+            # have a lot of newlines and it's not always clear where one paragraph ends
+            # and another begins.
+
+            # If I have time, I'll try to find a way to improve this
+            # TODO: Improve paragraph splitting
             paragraphs = [p.strip() for p in re.split(r"\n+", text) if p.strip()]
             
             # Validate result
@@ -138,11 +157,14 @@ class Extractor:
             RuntimeError: If model generation fails
         """
         # Validate input
+        # We are doing checks prior to this, so this should never happen
+        # in this case, but just for re-usability
         if not paragraph or not isinstance(paragraph, str):
             logger.warning("Invalid paragraph provided")
             return []
 
         # Define the prompt template for entity extraction
+        # TODO: Remove this into a config file, not hardcoded inside the code.
         prompt = f"""
         You are a medical entity extraction system.
         Identify and extract medically relevant entities from the following paragraph.
