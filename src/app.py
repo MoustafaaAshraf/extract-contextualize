@@ -1,5 +1,6 @@
 from src import PDFParser
 from src import Extractor
+from src import Entity
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Response, status
 from typing import List
@@ -13,23 +14,12 @@ import os
 # Load environment variables
 load_dotenv()
 
-
-# Hardcoded configuration
 GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-GCP_MODEL_NAME = "gemini-1.0-pro-001"  # Hardcoded instead of using env var
 GCP_LOCATION = os.getenv("GCP_LOCATION")
+GCP_MODEL_NAME = "gemini-1.0-pro-001"
 
 extractor = Extractor(GCP_MODEL_NAME, GCP_PROJECT_ID, GCP_LOCATION)
 logger.info("Model initialized")
-
-
-# Define the Entity model
-class Entity(BaseModel):
-    entity: str
-    context: str
-    start: int
-    end: int
-
 
 app = FastAPI(
     title="Medical Entity Extraction API",
@@ -39,7 +29,6 @@ app = FastAPI(
     ),
     version="1.0.0",
 )
-
 
 @app.post(
     "/api/v1/extract",
@@ -70,30 +59,33 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
             - 500: For unexpected server errors
     """
     try:
-        # Validate file existence and name
+        # The file argument isn't optional, however FastAPI doesn't enforce it, which I doubt...
         if not file:
-            raise HTTPException(status_code=400, detail="No file provided")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No file provided")
+        # a file was uploaded but the filename was somehow stripped or corrupted
         if not file.filename:
-            raise HTTPException(status_code=400, detail="No filename provided")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No filename provided")
 
-        # Validate file type
+        # Validate the file type
+        # TODO: This is a bit of a hack, but it's a quick fix. Is there a better way to do this?
         if not file.filename.lower().endswith(".pdf"):
             raise HTTPException(
-                status_code=415,
+                status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                 detail="Unsupported file type. Only PDF files are accepted",
             )
 
         # Read file content
         try:
             content = await file.read()
-            # Check file size (e.g., 10MB limit)
-            if len(content) > 10 * 1024 * 1024:
+            # Check file size (e.g., 30MB limit)
+            if len(content) > 30 * 1024 * 1024:
                 raise HTTPException(
-                    status_code=413, detail="File size too large. Maximum size is 10MB"
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail="File size too large. Maximum size is 30MB"
                 )
         except Exception as e:
             logger.error(f"Error reading file: {e}")
-            raise HTTPException(status_code=400, detail="Error reading file content")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error reading file content")
 
         # Process PDF file
         try:
@@ -106,9 +98,10 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
                 parser = PDFParser()
                 pdf_text = parser.parse_pdf(temp.name)
 
+                # Empty PDF or parsing/processing failed
                 if not pdf_text:
                     raise HTTPException(
-                        status_code=422,
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                         detail=(
                             "Unable to extract text from PDF. "
                             "File may be empty or corrupted"
@@ -116,7 +109,7 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
                     )
         except Exception as e:
             logger.error(f"PDF parsing error: {e}")
-            raise HTTPException(status_code=422, detail="Failed to parse PDF content")
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Failed to parse PDF content")
         finally:
             # Clean up temporary file
             try:
@@ -127,8 +120,7 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
         # Extract entities from text
         try:
             logger.info("Extracting medical entities from text")
-            # Note: Currently processing first 1000 chars only - might need adjustment
-            entities = extractor.extract_entities(pdf_text[:1000])
+            entities = extractor.extract_entities(pdf_text)
 
             if not entities:
                 logger.warning("No entities found in document")
@@ -140,25 +132,34 @@ async def extract_entities(file: UploadFile = File(...)) -> List[Entity]:
         except Exception as e:
             logger.error(f"Entity extraction error: {e}")
             raise HTTPException(
-                status_code=500, detail="Failed to extract entities from document"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to extract entities from document"
             )
 
-    except HTTPException:
+    except HTTPException as e:
         # Re-raise HTTP exceptions without modification
-        raise
+        raise e
     except Exception as e:
         # Log unexpected errors and return generic error message
         logger.exception(f"Unexpected error processing file '{file.filename}': {e}")
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while processing the file",
         )
 
 
 @app.get("/health")
 async def health_check():
+    """
+    Health check endpoint to ensure the API is running. Given that this is a
+    simple API, it's not necessary to check the health of the model or the
+    underlying infrastructure. However, Cloud Run requires a health check
+    endpoint to be present. and it does send a health check request every 60s.
+    If I remember correctly :)
+    """
     return Response(status_code=status.HTTP_200_OK)
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    # TODO: Remove reload=True when done testing
+    uvicorn.run(app, host="0.0.0.0", port=8080, reload=True)
