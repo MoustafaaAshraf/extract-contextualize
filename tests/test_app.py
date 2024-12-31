@@ -3,9 +3,14 @@ import pytest
 from fastapi.testclient import TestClient
 from src.app import app
 import os
+from unittest.mock import patch
 
 client = TestClient(app)
 
+@pytest.fixture
+def mock_extractor():
+    with patch('src.app.Extractor') as mock:
+        yield mock
 
 def test_extract_empty_file():
     # Test with no file

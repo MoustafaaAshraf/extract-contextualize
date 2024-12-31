@@ -17,7 +17,7 @@ def test_parse_empty_pdf(pdf_parser, test_files_dir):
 
 def test_parse_simple_pdf(pdf_parser, test_files_dir):
     result = pdf_parser.parse_pdf(test_files_dir / "valid.pdf")
-    assert "medical marvel" in result
+    assert "Paracetamol" in result
 
 def test_parse_corrupt_pdf(pdf_parser, test_files_dir):
     with pytest.raises(ValueError):
